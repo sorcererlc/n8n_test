@@ -1,0 +1,708 @@
+{
+  "active": true,
+  "connections": {
+    "Extract Item Details": {
+      "main": [
+        [
+          {
+            "node": "Extract Supplier Array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Supplier Array": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Mistral Chat - Extract EPD from PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get NOBB Item Test": {
+      "main": [
+        [
+          {
+            "node": "Extract Item Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Get Item from NOBB": {
+      "main": [
+        [
+          {
+            "node": "Get NOBB Item Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - CSV Upload": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - PDF Test": {
+      "main": [
+        [
+          {
+            "node": "Mistral Chat - PDF Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Chat - Extract EPD from PDF": {
+      "main": [
+        [
+          {
+            "node": "Cleanup Mistral Output NOBB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Chat - PDF Test": {
+      "main": [
+        [
+          {
+            "node": "Cleanup Mistral Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get NOBB Item Details": {
+      "main": [
+        [
+          {
+            "node": "Extract Item Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test with NOBB Number 57925314": {
+      "main": [
+        [
+          {
+            "node": "Get NOBB Item Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - CSV Upload1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Get NOBB Item Details1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Item Details1": {
+      "main": [
+        []
+      ]
+    },
+    "Get NOBB Item Details1": {
+      "main": [
+        [
+          {
+            "node": "Extract Item Details1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cleanup Mistral Output NOBB": {
+      "main": [
+        [
+          {
+            "node": "Merge emission data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge emission data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-04-08T11:31:06.549Z",
+  "id": "u81JddwuKThbcEMV",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "ImportFlow",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => {\n  let out = {\n    nobbNumber: item.json.nobbNumber,\n    suppliers: [],\n    properties: {\n      epd: [],\n    },\n  }\n\n  if (item.json.suppliers !== null) {\n    out.suppliers = item.json.suppliers.map((sup) => {\n      let s = {\n        name: sup.name,\n      }\n\n      if (sup.media !== null) {\n        sup.media.forEach((m) => {\n            if (m.mediaType.toLowerCase() === \"epd\") {\n              s.epd = m\n            }\n        })\n      }\n\n      return s\n    })\n  }\n\n  if (item.json.properties?.epd !== null) {\n    out.properties.epd = item.json.properties.epd.map((e) => {\n      return e\n    })\n  }\n\n  return out\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        0
+      ],
+      "id": "c6d6dc35-44d1-4ba4-be4a-d7725d63d47b",
+      "name": "Extract Item Details"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => {\n    return {\n      suppliers: item.json.suppliers\n    }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "3a1facfd-cf58-4584-be93-7566ef693122",
+      "name": "Extract Supplier Array"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "suppliers",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        0
+      ],
+      "id": "a5057c3f-ee4f-45fb-8ab4-5ad818fac1a3",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "https://export.byggtjeneste.no/api/v2/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "nobbnos",
+              "value": "57925314"
+            },
+            {
+              "name": "pageSize",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -840,
+        -100
+      ],
+      "id": "0b7a1ce9-00e7-4c78-8cc6-3796986c4fd6",
+      "name": "Get NOBB Item Test",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "cyQafCy8GgzJaGJ5",
+          "name": "NOBB API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1060,
+        100
+      ],
+      "id": "9d2dc849-521d-4743-9dae-7f09001b9181",
+      "name": "Webhook - Get Item from NOBB",
+      "webhookId": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1060,
+        -620
+      ],
+      "id": "8bac3415-8779-4dfc-aa20-89d75cb451f9",
+      "name": "Webhook - CSV Upload",
+      "webhookId": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        -620
+      ],
+      "id": "e77aa515-9f18-4792-bfa1-1f5abd3c7263",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1060,
+        -360
+      ],
+      "id": "53a0fc8b-aee8-40a9-b364-0d2ab5432c39",
+      "name": "Webhook - PDF Test",
+      "webhookId": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.mistral.ai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"model\": \"mistral-small-latest\",\n\t\"messages\": [\n\t\t{\n\t\t\t\"role\": \"user\",\n\t\t\t\"content\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"text\",\n\t\t\t\t\t\"text\": \"Extract the total emission value (GWP Total) for production stages A1 to A3 from an EPD for the product named '{{ $('Webhook - Get Item from NOBB').item.json.body.productName }}'.\\nOutput the results for each product in the document as JSON array with objects containing the following fields: productName, ean, propertyName, value, unit.\\n\\nImportant notes:\\n* Only output the JSON without any reasoning text and formatting.\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"document_url\",\n\t\t\t\t\t\"document_url\": \"{{ $('Split Out').item.json.epd.url }}\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t],\n\t\"document_image_limit\": 8,\n\t\"document_page_limit\": 64\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        0
+      ],
+      "id": "45dbb254-ebcb-4974-bece-217337c8243a",
+      "name": "Mistral Chat - Extract EPD from PDF",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "G4csHmSvnQmDo1cX",
+          "name": "Mistral C11"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.mistral.ai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"model\": \"mistral-small-latest\",\n\t\"messages\": [\n\t\t{\n\t\t\t\"role\": \"user\",\n\t\t\t\"content\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"text\",\n\t\t\t\t\t\"text\": \"Extract the total emission value (GWP Total) for production stages A1 to A3 from an EPD.\\nOutput the results for each product in the document as JSON array with objects containing the following fields: productName, value, unit.\\n\\nImportant notes:\\n* Only output the JSON without any reasoning text and formatting.\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"document_url\",\n\t\t\t\t\t\"document_url\": \"{{ $json.body.url }}\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t],\n\t\"document_image_limit\": 8,\n\t\"document_page_limit\": 64\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -840,
+        -360
+      ],
+      "id": "1dc00fe5-3d00-4032-8b70-a03dfb9a7be5",
+      "name": "Mistral Chat - PDF Test",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "G4csHmSvnQmDo1cX",
+          "name": "Mistral C11"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://export.byggtjeneste.no/api/v2/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "nobbnos",
+              "value": "={{ $json.body.nobbnos }}"
+            },
+            {
+              "name": "pageSize",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -840,
+        100
+      ],
+      "id": "5d0b4056-2587-418e-a7cf-e4f24ee0a9a3",
+      "name": "Get NOBB Item Details",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "cyQafCy8GgzJaGJ5",
+          "name": "NOBB API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1060,
+        -100
+      ],
+      "id": "ec870c0b-97a4-4020-a0e2-37215f920897",
+      "name": "Test with NOBB Number 57925314"
+    },
+    {
+      "parameters": {
+        "jsCode": "let input = $input.first().json.choices[0].message.content\ninput = input.replaceAll('`', '')\ninput = input.replaceAll('json', '')\ninput = input.replaceAll('\\n', '')\n\nlet out = JSON.parse(input)\nout = out.map((i) => {\n  i.nobbNumber = $('Extract Item Details').first().json.nobbNumber\n  return i\n})\n\nreturn {\n  result: out,\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "id": "a45cc341-64dc-4f4a-b7ac-bf7a582f4d0d",
+      "name": "Cleanup Mistral Output NOBB"
+    },
+    {
+      "parameters": {
+        "jsCode": "let input = $input.first().json.choices[0].message.content\ninput = input.replaceAll('`', '')\ninput = input.replaceAll('json', '')\ninput = input.replaceAll('\\n', '')\n\nreturn {\n  result: JSON.parse(input),\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        -360
+      ],
+      "id": "0d3b60b3-b9ec-47ff-99c5-533e39e732a6",
+      "name": "Cleanup Mistral Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "let out = []\n\nfor (const item of $input.all()) {\n  out.push({\n    productName: item.json.Product,\n    ean: item.json.EAN,\n    propertyName: 'GWP Total',\n    value: item.json['GWP Total (kg CO2 eq.)'],\n    unit: 'kg CO2 eq.',\n    nobbNumber: item.json[\"NOBB Number (if available)\"]\n  })\n}\n\nreturn out"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        -620
+      ],
+      "id": "65eb4ad5-3d56-4796-b7b1-af6ae7980d2b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1060,
+        360
+      ],
+      "id": "ee79babe-62c3-4ab7-901c-af635719b347",
+      "name": "Webhook - CSV Upload1",
+      "webhookId": "cbfd861d-ee33-4ee1-88f3-1cfc8787d163"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        360
+      ],
+      "id": "89b832f2-6aca-4635-a0de-60d392b271ef",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = $input.all().map((item) => {\n  return item.json['NOBB number']\n})\n\nreturn {\n  nobbnos: out.join(',')\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        360
+      ],
+      "id": "3d9ae6c5-233b-4ab6-a8b1-ba801eaa415d",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let out = $('Extract from File1').all().map((item) => {\n  return item.json\n})\n\nconst updateItem = (no, upd) => {\n  out = out.map((i) => {\n    if (i['NOBB number'] === no) {\n      return Object.assign({}, i, ...upd)\n    }\n\n    return i\n  })\n}\n\nreturn $input.all().map((item) => {\n  let upd = {\n    'Has EPD': false,\n    'Has emission (via API)': false,\n  }\n  \n  if (item.json.suppliers !== null) {\n    item.json.suppliers.forEach((sup) => {\n      if (sup.media !== null) {\n        sup.media.forEach((m) => {\n            if (m.mediaType.toLowerCase() === \"epd\") {\n              upd['Has EPD'] = true\n            }\n        })\n      }\n    })\n  }\n\n  if (item.json.properties?.epd !== null) {\n      upd['Has emission (via API)'] = true\n  }\n\n  updateItem(item.json.nobbNumber, upd)\n\n  console.log(out)\n\n  return out\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -180,
+        360
+      ],
+      "id": "18dbe3f1-01ca-4195-a327-30b116b52bb2",
+      "name": "Extract Item Details1"
+    },
+    {
+      "parameters": {
+        "url": "https://export.byggtjeneste.no/api/v2/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "nobbnos",
+              "value": "={{ $json.nobbnos }}"
+            },
+            {
+              "name": "pageSize",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        360
+      ],
+      "id": "a226ca1c-6fbc-4ef1-873e-4f76f7660c2d",
+      "name": "Get NOBB Item Details1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "cyQafCy8GgzJaGJ5",
+          "name": "NOBB API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Parse CSV with NOBB numbers to find which have EPD docs and parsed info",
+        "height": 280,
+        "width": 1160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        280
+      ],
+      "id": "72d5a7f4-6b15-4dd6-89d3-acccb0903a73",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Poduction flow",
+        "height": 420,
+        "width": 2100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        -160
+      ],
+      "id": "f7844db8-b7a8-41ac-a440-51fac1749b49",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let out = {\n  productId: $('Webhook - Get Item from NOBB').first().json.body.productId,\n  api: [],\n  epd: [],\n}\n\nfor (const i of $input.all()) {\n  i.json.result.forEach((item) => out.api.push({\n    supplier: $('Split Out').first().json.name,\n    ...item,\n  }))\n}\n\nif ($('Extract Item Details').first().json.properties?.epd) {\n  for (const i of $('Extract Item Details').first().json.properties?.epd) {\n    if (i.propertyName.match(/A1.*?GWP.*?Total/)) {\n      i.propertyName = 'GWP Total'\n      i.value = parseFloat(i.value)\n      i.nobbNumber = $('Extract Item Details').first().json.nobbNumber\n      i.url = $('Split Out').first().json.epd.url\n      out.epd.push(i)\n    }\n  }\n}\n\nreturn out"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "20ec2cd0-907c-4733-8bf0-c69dba4b071e",
+      "name": "Merge emission data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://riviera.cristiant.com:8001/api/Emission/AcceptProductEmissionsData",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        0
+      ],
+      "id": "bacad0c3-b4f9-4b30-850c-4d1e630a6792",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2025-04-08T11:31:06.554Z",
+      "updatedAt": "2025-04-08T11:31:06.554Z",
+      "role": "workflow:owner",
+      "workflowId": "u81JddwuKThbcEMV",
+      "projectId": "c2zBf8CIhDAJuJOb",
+      "project": {
+        "createdAt": "2025-04-08T11:27:20.621Z",
+        "updatedAt": "2025-05-22T14:58:47.010Z",
+        "id": "c2zBf8CIhDAJuJOb",
+        "name": "C T <cristian@code11.com>",
+        "type": "personal",
+        "icon": null,
+        "projectRelations": [
+          {
+            "createdAt": "2025-04-08T11:27:20.621Z",
+            "updatedAt": "2025-04-08T11:27:20.621Z",
+            "role": "project:personalOwner",
+            "userId": "8c1b7d96-2d0f-4230-94bc-145c0eb01b88",
+            "projectId": "c2zBf8CIhDAJuJOb",
+            "user": {
+              "createdAt": "2025-04-08T11:27:20.316Z",
+              "updatedAt": "2025-05-22T14:58:46.999Z",
+              "id": "8c1b7d96-2d0f-4230-94bc-145c0eb01b88",
+              "email": "cristian@code11.com",
+              "firstName": "C",
+              "lastName": "T",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-04-08T11:28:52.667Z",
+                "personalization_survey_n8n_version": "1.85.4",
+                "companyType": "personal",
+                "reportedSource": "google"
+              },
+              "settings": {
+                "userActivated": false,
+                "easyAIWorkflowOnboarded": true
+              },
+              "role": "global:owner",
+              "disabled": false,
+              "mfaEnabled": false,
+              "isPending": false,
+              "isOwner": true
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 4,
+  "updatedAt": "2025-04-25T13:54:04.000Z",
+  "versionId": "4e12554b-992d-4815-9d98-c87c1800ed8f"
+}
